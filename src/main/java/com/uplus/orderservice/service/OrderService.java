@@ -1,12 +1,12 @@
-package com.uplus.OrderService.service;
+package com.uplus.orderservice.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uplus.OrderService.domain.customer.Customer;
-import com.uplus.OrderService.domain.customer.CustomerRepository;
-import com.uplus.OrderService.dto.CustomerRequestDto;
-import com.uplus.OrderService.dto.CustomerResponseDto;
+import com.uplus.orderservice.domain.customer.Customer;
+import com.uplus.orderservice.domain.customer.CustomerRepository;
+import com.uplus.orderservice.dto.CustomerRequestDto;
+import com.uplus.orderservice.dto.CustomerResponseDto;
 
 import lombok.RequiredArgsConstructor;
 

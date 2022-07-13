@@ -1,6 +1,6 @@
-package com.uplus.OrderService.dto;
+package com.uplus.orderservice.dto;
 
-import com.uplus.OrderService.domain.customer.Customer;
+import com.uplus.orderservice.domain.customer.Customer;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.uplus.OrderService.domain.customer;
+package com.uplus.orderservice.domain.customer;
 
 
 import org.springframework.data.jpa.repository.JpaRepository;
