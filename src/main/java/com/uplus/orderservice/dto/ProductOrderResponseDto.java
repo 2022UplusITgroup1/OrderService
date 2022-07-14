@@ -1,6 +1,6 @@
 package com.uplus.orderservice.dto;
 
-import com.uplus.orderservice.domain.productOrder.ProductOrder;
+import com.uplus.orderservice.entity.ProductOrder;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

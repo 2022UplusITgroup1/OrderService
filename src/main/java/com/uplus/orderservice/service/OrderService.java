@@ -7,13 +7,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.uplus.orderservice.domain.customer.Customer;
-import com.uplus.orderservice.domain.customer.CustomerRepository;
-import com.uplus.orderservice.domain.productOrder.ProductOrder;
-import com.uplus.orderservice.domain.productOrder.ProductOrderRepository;
 import com.uplus.orderservice.dto.CustomerRequestDto;
 import com.uplus.orderservice.dto.CustomerResponseDto;
 import com.uplus.orderservice.dto.ProductOrderResponseDto;
+import com.uplus.orderservice.entity.Customer;
+import com.uplus.orderservice.entity.ProductOrder;
+import com.uplus.orderservice.repository.CustomerRepository;
+import com.uplus.orderservice.repository.ProductOrderRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -77,6 +77,7 @@ public class OrderService {
 
             ProductOrder entity = productOrderRepository.findByCustomerIdAndOrderNumber(customerId,orderNumber);
             productOorderResponseDto=new ProductOrderResponseDto(entity);
+            productOorderResponseDto.setName(customerResponseDto.getName());
 
         }catch(Exception e){
             productOorderResponseDto=null;

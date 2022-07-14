@@ -1,4 +1,4 @@
-package com.uplus.orderservice.domain.customer;
+package com.uplus.orderservice.entity;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.uplus.orderservice.domain.productOrder;
+package com.uplus.orderservice.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,8 +9,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.uplus.orderservice.domain.customer.Customer;
 
 import lombok.Builder;
 import lombok.Getter;

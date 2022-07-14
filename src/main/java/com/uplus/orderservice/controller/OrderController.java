@@ -66,7 +66,6 @@ public class OrderController {
             map.put("message", "알맞은 결과를 찾을 수 없습니다.");
             map.put("data", null);
         }else{
-            productOrderResponseDto.setName(name);
             map.put("status", "200");
             map.put("message", "주문 조회 성공");
             map.put("data", productOrderResponseDto);
@@ -77,35 +76,35 @@ public class OrderController {
     }
 
     //상품 주문 결제
-    @PostMapping("/order/payment")
-    public Map<String, Object> payProductOrder(@RequestParam("name") String name, 
-                                                    @RequestParam("email") String email, 
-                                                    @RequestParam("address") String address,
-                                                    @RequestParam("phone_number") String phoneNumber, 
-                                                    @RequestParam("phone_id") String phoneId,
-                                                    @RequestParam("plan_id") String planId, 
-                                                    @RequestParam("month_price") String monthPrice) {
+    // @PostMapping("/order/payment")
+    // public Map<String, Object> payProductOrder(@RequestParam("name") String name, 
+    //                                                 @RequestParam("email") String email, 
+    //                                                 @RequestParam("address") String address,
+    //                                                 @RequestParam("phone_number") String phoneNumber, 
+    //                                                 @RequestParam("phone_id") String phoneId,
+    //                                                 @RequestParam("plan_id") String planId, 
+    //                                                 @RequestParam("month_price") String monthPrice) {
 
-        Map<String, Object> map = new HashMap<>();
+    //     Map<String, Object> map = new HashMap<>();
         
-        CustomerResponseDto customerResponseDto=orderService.findCustomerByNameAndPhoneNumber(name, phoneNumber);
+    //     CustomerResponseDto customerResponseDto=orderService.findCustomerByNameAndPhoneNumber(name, phoneNumber);
         
-        ProductOrderResponseDto productOrderResponseDto= orderService.findOrderByCustomer(customerResponseDto, orderNumber);
+    //     ProductOrderResponseDto productOrderResponseDto= orderService.findOrderByCustomer(customerResponseDto, orderNumber);
 
-        if(productOrderResponseDto==null){
-            map.put("status", "204");
-            map.put("message", "알맞은 결과를 찾을 수 없습니다.");
-            map.put("data", null);
-        }else{
-            productOrderResponseDto.setName(name);
-            map.put("status", "200");
-            map.put("message", "주문 조회 성공");
-            map.put("data", productOrderResponseDto);
-        }
+    //     if(productOrderResponseDto==null){
+    //         map.put("status", "204");
+    //         map.put("message", "알맞은 결과를 찾을 수 없습니다.");
+    //         map.put("data", null);
+    //     }else{
+    //         productOrderResponseDto.setName(name);
+    //         map.put("status", "200");
+    //         map.put("message", "주문 조회 성공");
+    //         map.put("data", productOrderResponseDto);
+    //     }
 
 
-        return map;
-    }
+    //     return map;
+    // }
 
 
 }
