@@ -58,18 +58,28 @@ public class OrderController {
         Map<String, Object> map = new HashMap<>();
         
         CustomerResponseDto customerResponseDto=orderService.findCustomerByNameAndPhoneNumber(name, phoneNumber);
-        
-        ProductOrderResponseDto productOrderResponseDto= orderService.findOrderByCustomer(customerResponseDto, orderNumber);
 
-        if(productOrderResponseDto==null){
+        if(customerResponseDto==null){
             map.put("status", "204");
-            map.put("message", "알맞은 결과를 찾을 수 없습니다.");
+            map.put("message", "주문자 이름 또는 전화번호를 찾을 수 없습니다.");
             map.put("data", null);
+
         }else{
-            map.put("status", "200");
-            map.put("message", "주문 조회 성공");
-            map.put("data", productOrderResponseDto);
+
+            ProductOrderResponseDto productOrderResponseDto= orderService.findOrderByCustomer(customerResponseDto, orderNumber);
+
+            if(productOrderResponseDto==null){
+                map.put("status", "204");
+                map.put("message", "알맞은 주문 번호를 찾을 수 없습니다.");
+                map.put("data", null);
+            }else{
+                map.put("status", "200");
+                map.put("message", "주문 조회 성공");
+                map.put("data", productOrderResponseDto);
+            }
         }
+        
+        
 
 
         return map;

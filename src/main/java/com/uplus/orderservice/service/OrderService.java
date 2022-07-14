@@ -37,13 +37,19 @@ public class OrderService {
     }
 
     public CustomerResponseDto findCustomerByNameAndPhoneNumber (String name, String phoneNumber) {
-        Customer entity = customerRepository.findByNameAndPhoneNumber(name, phoneNumber);
-        // Long customerId=customerEntity.getId();
-        // Order orderEntity= orderRepository.findByCustomerId(customerId);
+        
+        CustomerResponseDto customerResponseDto;
 
-        // OrderResponseDto = new 
+        try{
+            Customer customerEntity = customerRepository.findByNameAndPhoneNumber(name, phoneNumber);
+            customerResponseDto = new CustomerResponseDto(customerEntity);
+
+        }catch(Exception e){
+            customerResponseDto = null;
+        }
+
  
-        return new CustomerResponseDto(entity);
+        return customerResponseDto;
     }
 
 
@@ -75,8 +81,8 @@ public class OrderService {
 
         try{
 
-            ProductOrder entity = productOrderRepository.findByCustomerIdAndOrderNumber(customerId,orderNumber);
-            productOorderResponseDto=new ProductOrderResponseDto(entity);
+            ProductOrder productOrderEntity = productOrderRepository.findByCustomerIdAndOrderNumber(customerId,orderNumber);
+            productOorderResponseDto=new ProductOrderResponseDto(productOrderEntity);
             productOorderResponseDto.setName(customerResponseDto.getName());
 
         }catch(Exception e){
