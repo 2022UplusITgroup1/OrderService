@@ -4,11 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
 
 @Getter
 @NoArgsConstructor
@@ -30,6 +35,9 @@ public class Customer {
 
     @Column
     private String phoneNumber;
+
+    // @OneToMany
+    // private List<Order> order = new ArrayList<Order>();
 
     @Builder
     public Customer(String name, String email, String address, String phoneNumber) {
