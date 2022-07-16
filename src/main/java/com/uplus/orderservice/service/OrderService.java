@@ -7,13 +7,18 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.uplus.orderservice.feginclient.ProductServiceClient;
 import com.uplus.orderservice.dto.CustomerRequestDto;
 import com.uplus.orderservice.dto.CustomerResponseDto;
 import com.uplus.orderservice.dto.ProductOrderResponseDto;
+import com.uplus.orderservice.dto.ProductResponseDto;
 import com.uplus.orderservice.entity.Customer;
 import com.uplus.orderservice.entity.ProductOrder;
 import com.uplus.orderservice.repository.CustomerRepository;
 import com.uplus.orderservice.repository.ProductOrderRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +27,9 @@ import lombok.RequiredArgsConstructor;
 public class OrderService {
     private final CustomerRepository customerRepository;
     private final ProductOrderRepository productOrderRepository;
+    private final ProductServiceClient productServiceClient;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    // private final RestTemplate restTemplate;
 
     @Transactional
     public Long save(CustomerRequestDto requestDto) {
@@ -98,10 +106,38 @@ public class OrderService {
     public ProductOrderResponseDto findOrderByOrderNumber (String orderNumber) {
         ProductOrder entity = productOrderRepository.findByOrderNumber(orderNumber);
         // ProductOrder entity = productOrderRepository.findByOrderNumber(orderNumber);
-        ProductOrderResponseDto productOorderResponseDto=new ProductOrderResponseDto(entity);
+        ProductOrderResponseDto productOrderResponseDto=new ProductOrderResponseDto(entity);
  
-        return productOorderResponseDto;
+        return productOrderResponseDto;
     }
+
+
+    //Product Service API 통신
+    //단말 정보 가져오기
+    public ProductResponseDto getProductDetail (String planCode, String phoneCode, String phoneColor, Integer discountType) {
+
+        // String url=String.format("http://", args);
+        // try{
+
+        // logger.info("planCode : " + planCode +
+        //             " phoneCode : " + phoneCode + " phoneColor : " + phoneColor + " discountType " + discountType);
+        // }
+        ProductResponseDto productResponseJson=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
+
+        System.out.println(productResponseJson);
+
+        Integer monthPrice;
+
+        // ProductResponseDto productResponseDto=productResponseJson.get("data")
+
+
+
+        return productResponseJson;
+    }
+
+
+
+
 
     // public List<OrderResponseDto> getAllOrderList (String name, String phoneNumber, String orderNumber) {
     //     List<Order> orderList=new ArrayList<>();

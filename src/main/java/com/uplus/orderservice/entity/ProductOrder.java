@@ -26,10 +26,13 @@ public class ProductOrder {
     private Long customerId;
 
     @Column
-    private Long phoneId;
+    private String phoneCode;
 
     @Column
-    private Long planId;
+    private String phoneColor;
+
+    @Column
+    private String planCode;
 
     @Column
     private String orderNumber;
@@ -60,10 +63,11 @@ public class ProductOrder {
     // private Customer customer;
 
     @Builder
-    public ProductOrder(Long customerId, Long phoneId, Long planId, String orderNumber, int monthPrice) {
+    public ProductOrder(Long customerId, String phoneCode, String phoneColor ,String planCode, String orderNumber, int monthPrice) {
         this.customerId = customerId;
-        this.phoneId = phoneId;
-        this.planId = planId;
+        this.phoneCode = phoneCode;
+        this.phoneColor = phoneColor;
+        this.planCode = planCode;
         this.orderNumber = orderNumber;
         this.monthPrice = monthPrice;
     }
