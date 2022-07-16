@@ -1,17 +1,21 @@
 package com.uplus.orderservice.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uplus.orderservice.feginclient.ProductServiceClient;
+import com.uplus.orderservice.feginclient.SearchCorrectApiClient;
 import com.uplus.orderservice.dto.CustomerRequestDto;
 import com.uplus.orderservice.dto.CustomerResponseDto;
 import com.uplus.orderservice.dto.ProductOrderResponseDto;
 import com.uplus.orderservice.dto.ProductResponseDto;
+import com.uplus.orderservice.dto.SearchCorrectResponseDto;
 import com.uplus.orderservice.entity.Customer;
 import com.uplus.orderservice.entity.ProductOrder;
 import com.uplus.orderservice.repository.CustomerRepository;
@@ -28,8 +32,20 @@ public class OrderService {
     private final CustomerRepository customerRepository;
     private final ProductOrderRepository productOrderRepository;
     private final ProductServiceClient productServiceClient;
+
+
+    private final SearchCorrectApiClient searchCorrectApiClient;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     // private final RestTemplate restTemplate;
+
+
+    public SearchCorrectResponseDto getCorrectWord(String query){
+        SearchCorrectResponseDto map =searchCorrectApiClient.getCorrectString(query);
+
+
+        return map;
+    }
 
     @Transactional
     public Long save(CustomerRequestDto requestDto) {
