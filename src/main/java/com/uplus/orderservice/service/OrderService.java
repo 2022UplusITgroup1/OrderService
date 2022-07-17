@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,6 +139,7 @@ public class OrderService {
         return monthPrice;
     }
 
+
     @Transactional
     public Long saveCustomer(CustomerRequestDto requestDto) {
         
@@ -175,7 +177,7 @@ public class OrderService {
 
     @Transactional
     public Long saveCustomerProductOrder(ProductOrderRequestDto productOrderRequestDto) {
-        //비회원 주문이므로 (주문자 정보 insert , 주문 정보 insert) 같은 Transaction
+        //비회원 주문이므로 (주문자 정보 insert , 주문 정보 insert) Transaction
         //insert Customer
         String name=productOrderRequestDto.getName();
         String email=productOrderRequestDto.getEmail();
@@ -193,6 +195,10 @@ public class OrderService {
         int monthPrice=productOrderRequestDto.getMonthPrice();
 
         //주문 번호 난수 생성 필요
+        Random rand = new Random();
+        rand.setSeed(System.currentTimeMillis());
+        int randNum=(int)(rand.nextDouble()*10000);
+        // int randNum=(int)(rand.nextInt(1000000));
         String orderNumber="1234";
 
         ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,orderNumber,monthPrice);

@@ -122,9 +122,7 @@ public class OrderController {
         int discountType=productOrderRequestDto.getDiscountType();
 
         int monthPrice=productOrderRequestDto.getMonthPrice();
-        
-
-        // logger.info(" phonePrice : " + ((Map<String, Object>) productResponseDto.getData().get("phone")).get("price"));
+    
 
         //productResponseDto 의
         //단말 가격/할부기간
@@ -140,16 +138,20 @@ public class OrderController {
                 //주문자 정보 입력
                 Long customerId=orderService.saveCustomerProductOrder(productOrderRequestDto);
                 // if(customerId!=null){// Transaction 성공시
+                        //결제가 완료되었습니다.
+
                 //     //주문 정보 입력
                 //     Long productOrderId=orderService.saveProductOrder(productOrderRequestDto, customerId);
                 // }
 
             }else{
                 //DB 가격 정보 상이. 결제 실패
+                //주문정보가 다릅니다. 결제를 다시 진행해주세요.
 
             }
         }else{
             //Product 정보 가져오기 실패
+            //"주문정보를 가져올 수 없습니다."
         }
 
         return productResponseDto;
