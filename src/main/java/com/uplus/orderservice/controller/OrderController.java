@@ -17,7 +17,6 @@ import com.uplus.orderservice.dto.CustomerResponseDto;
 import com.uplus.orderservice.dto.ProductOrderRequestDto;
 import com.uplus.orderservice.dto.ProductOrderResponseDto;
 import com.uplus.orderservice.dto.ProductResponseDto;
-import com.uplus.orderservice.dto.SearchCorrectResponseDto;
 import com.uplus.orderservice.service.OrderService;
 
 import org.slf4j.Logger;
@@ -32,17 +31,6 @@ public class OrderController {
     private final OrderService orderService;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-
-    @GetMapping("/search/correct")
-    public SearchCorrectResponseDto getCorrectWord (@RequestParam("query") String query) {
-
-        SearchCorrectResponseDto map =orderService.getCorrectWord(query);
-        
-        logger.info("correct query : "+map.toString());
-
-        return map;
-    }
 
 
     @PostMapping("/order")
