@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uplus.orderservice.dto.CustomerRequestDto;
 import com.uplus.orderservice.dto.CustomerResponseDto;
+import com.uplus.orderservice.dto.PhoneResponseDto;
+import com.uplus.orderservice.dto.PlanResponseDto;
 import com.uplus.orderservice.dto.ProductOrderRequestDto;
 import com.uplus.orderservice.dto.ProductOrderResponseDto;
-import com.uplus.orderservice.dto.ProductResponseDto;
+import com.uplus.orderservice.dto.ResponseDto;
+import com.uplus.orderservice.dto.ResponseMessage;
 import com.uplus.orderservice.service.OrderService;
 
 import org.slf4j.Logger;
@@ -71,7 +74,7 @@ public class OrderController {
                     " phone_number : " + phoneNumber + " order_number : " + orderNumber);
         
         
-        CustomerResponseDto customerResponseDto=orderService.findCustomerByNameAndPhoneNumber(name, phoneNumber);
+        CustomerResponseDto customerResponseDto=orderService.getCustomer(name, phoneNumber);
 
         if(customerResponseDto==null){
             map.put("status", "204");
@@ -80,7 +83,7 @@ public class OrderController {
 
         }else{
 
-            ProductOrderResponseDto productOrderResponseDto= orderService.findOrderByCustomer(customerResponseDto, orderNumber);
+            ProductOrderResponseDto productOrderResponseDto= orderService.getOrder(customerResponseDto, orderNumber);
 
             if(productOrderResponseDto==null){
                 map.put("status", "204");
@@ -101,7 +104,7 @@ public class OrderController {
 
     //상품 주문 결제
     @PostMapping("/payment")
-    public ProductResponseDto payProductOrder(@RequestBody ProductOrderRequestDto productOrderRequestDto) {
+    public ResponseDto payProductOrder(@RequestBody ProductOrderRequestDto productOrderRequestDto) {
 
         // Map<String, Object> map = new HashMap<>();
         
@@ -109,26 +112,47 @@ public class OrderController {
         logger.info("planCode : " + productOrderRequestDto.getPlanCode() +
                     " phoneCode : " + productOrderRequestDto.getPhoneCode() + " phoneColor : " + productOrderRequestDto.getPhoneColor() + " discountType " + productOrderRequestDto.getDiscountType());
 
-        ProductResponseDto map=orderService.getProductDetail(productOrderRequestDto.getPlanCode(), productOrderRequestDto.getPhoneCode(), productOrderRequestDto.getPhoneColor(), productOrderRequestDto.getDiscountType());
+        ResponseDto productResponseDto=orderService.getProductDetail(productOrderRequestDto.getPlanCode(), productOrderRequestDto.getPhoneCode(), productOrderRequestDto.getPhoneColor(), productOrderRequestDto.getDiscountType());
         //주문한 plan_code로 plan 상세 조회
 
 
+        int phonePrice=(int) ((Map<String, Object>) productResponseDto.getData().get("phone")).get("price");
+        int planPrice=(int) ((Map<String, Object>) productResponseDto.getData().get("plan")).get("price");
+        int payPeriod=productOrderRequestDto.getPayPeriod();
+        int discountType=productOrderRequestDto.getDiscountType();
+
+        int monthPrice=productOrderRequestDto.getMonthPrice();
         
-    //     ProductOrderResponseDto productOrderResponseDto= orderService.findOrderByCustomer(customerResponseDto, orderNumber);
 
-    //     if(productOrderResponseDto==null){
-    //         map.put("status", "204");
-    //         map.put("message", "알맞은 결과를 찾을 수 없습니다.");
-    //         map.put("data", null);
-    //     }else{
-    //         productOrderResponseDto.setName(name);
-    //         map.put("status", "200");
-    //         map.put("message", "주문 조회 성공");
-    //         map.put("data", productOrderResponseDto);
-    //     }
+        // logger.info(" phonePrice : " + ((Map<String, Object>) productResponseDto.getData().get("phone")).get("price"));
 
+        //productResponseDto 의
+        //단말 가격/할부기간
+        // +
+        //요금제 가격
+        //==month_price 이면 결제.
 
-        return map;
+        if(productResponseDto.getStatus()==200){
+            if(orderService.calculatePrice(phonePrice, planPrice, payPeriod, discountType)==monthPrice){
+
+                //결제 실행
+
+                //주문자 정보 입력
+                Long customerId=orderService.saveCustomerProductOrder(productOrderRequestDto);
+                // if(customerId!=null){// Transaction 성공시
+                //     //주문 정보 입력
+                //     Long productOrderId=orderService.saveProductOrder(productOrderRequestDto, customerId);
+                // }
+
+            }else{
+                //DB 가격 정보 상이. 결제 실패
+
+            }
+        }else{
+            //Product 정보 가져오기 실패
+        }
+
+        return productResponseDto;
     }
     
 

@@ -12,8 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.uplus.orderservice.feginclient.ProductServiceClient;
 import com.uplus.orderservice.dto.CustomerRequestDto;
 import com.uplus.orderservice.dto.CustomerResponseDto;
+import com.uplus.orderservice.dto.ProductOrderRequestDto;
 import com.uplus.orderservice.dto.ProductOrderResponseDto;
-import com.uplus.orderservice.dto.ProductResponseDto;
+import com.uplus.orderservice.dto.ResponseDto;
+import com.uplus.orderservice.dto.ResponseMessage;
 import com.uplus.orderservice.entity.Customer;
 import com.uplus.orderservice.entity.ProductOrder;
 import com.uplus.orderservice.repository.CustomerRepository;
@@ -35,9 +37,6 @@ public class OrderService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     // private final RestTemplate restTemplate;
 
-
-
-
     @Transactional
     public Long save(CustomerRequestDto requestDto) {
         
@@ -51,8 +50,9 @@ public class OrderService {
         return new CustomerResponseDto(entity);
     }
 
-    public CustomerResponseDto findCustomerByNameAndPhoneNumber (String name, String phoneNumber) {
+    public CustomerResponseDto getCustomer (String name, String phoneNumber) {
         
+        //=null 안하면 null값 할당 안됨.
         CustomerResponseDto customerResponseDto;
 
         try{
@@ -89,7 +89,8 @@ public class OrderService {
         return productOorderResponseDto;
     }
 
-    public ProductOrderResponseDto findOrderByCustomer (CustomerResponseDto customerResponseDto,String orderNumber) {
+
+    public ProductOrderResponseDto getOrder (CustomerResponseDto customerResponseDto,String orderNumber) {
         ProductOrderResponseDto productOorderResponseDto;
 
         Long customerId = customerResponseDto.getId();
@@ -112,59 +113,93 @@ public class OrderService {
 
     public ProductOrderResponseDto findOrderByOrderNumber (String orderNumber) {
         ProductOrder entity = productOrderRepository.findByOrderNumber(orderNumber);
-        // ProductOrder entity = productOrderRepository.findByOrderNumber(orderNumber);
+
         ProductOrderResponseDto productOrderResponseDto=new ProductOrderResponseDto(entity);
  
         return productOrderResponseDto;
     }
 
 
-    //Product Service API 통신
+    //Feign Product Service API 통신
     //단말 정보 가져오기
-    public ProductResponseDto getProductDetail (String planCode, String phoneCode, String phoneColor, Integer discountType) {
+    public ResponseDto getProductDetail (String planCode, String phoneCode, String phoneColor, Integer discountType) {
 
-        // String url=String.format("http://", args);
-        // try{
-
-        // logger.info("planCode : " + planCode +
-        //             " phoneCode : " + phoneCode + " phoneColor : " + phoneColor + " discountType " + discountType);
-        // }
-        ProductResponseDto productResponseJson=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
-
-        System.out.println(productResponseJson);
-
-        Integer monthPrice;
-
-        // ProductResponseDto productResponseDto=productResponseJson.get("data")
+        ResponseDto productResponseDto=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
 
 
+        return productResponseDto;
+    }
 
-        return productResponseJson;
+    public int calculatePrice (int phonePrice, int planPrice, int payPeriod, int discountType) {
+
+        int monthPrice=(phonePrice/payPeriod)+planPrice;
+
+
+        return monthPrice;
+    }
+
+    @Transactional
+    public Long saveCustomer(CustomerRequestDto requestDto) {
+        
+        return customerRepository.save(requestDto.toEntity()).getId();
+    }
+
+    @Transactional
+    public Long saveCustomer(ProductOrderRequestDto productOrderRequestDto) {
+
+        String name=productOrderRequestDto.getName();
+        String email=productOrderRequestDto.getEmail();
+        String address=productOrderRequestDto.getAddress();
+        String phoneNumber=productOrderRequestDto.getPhoneNumber();
+
+        CustomerRequestDto customerRequestDto=new CustomerRequestDto(name,email,address,phoneNumber);
+        
+        return customerRepository.save(customerRequestDto.toEntity()).getId();
+    }
+
+    @Transactional
+    public Long saveProductOrder(ProductOrderRequestDto productOrderRequestDto, Long customerId) {
+
+        String phoneCode=productOrderRequestDto.getPhoneCode();
+        String phoneColor=productOrderRequestDto.getPhoneColor();
+        String planCode=productOrderRequestDto.getPlanCode();
+        int monthPrice=productOrderRequestDto.getMonthPrice();
+
+
+        String orderNumber="1234";
+
+        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,orderNumber,monthPrice);
+
+        return productOrderRepository.save(productOrderEntity).getId();
+    }
+
+    @Transactional
+    public Long saveCustomerProductOrder(ProductOrderRequestDto productOrderRequestDto) {
+        //비회원 주문이므로 (주문자 정보 insert , 주문 정보 insert) 같은 Transaction
+        //insert Customer
+        String name=productOrderRequestDto.getName();
+        String email=productOrderRequestDto.getEmail();
+        String address=productOrderRequestDto.getAddress();
+        String phoneNumber=productOrderRequestDto.getPhoneNumber();
+
+        CustomerRequestDto customerRequestDto=new CustomerRequestDto(name,email,address,phoneNumber);
+        
+        Long customerId=customerRepository.save(customerRequestDto.toEntity()).getId();
+        
+        //insert ProductOrder
+        String phoneCode=productOrderRequestDto.getPhoneCode();
+        String phoneColor=productOrderRequestDto.getPhoneColor();
+        String planCode=productOrderRequestDto.getPlanCode();
+        int monthPrice=productOrderRequestDto.getMonthPrice();
+
+        //주문 번호 난수 생성 필요
+        String orderNumber="1234";
+
+        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,orderNumber,monthPrice);
+
+        return productOrderRepository.save(productOrderEntity).getId();
     }
 
 
-
-
-
-    // public List<OrderResponseDto> getAllOrderList (String name, String phoneNumber, String orderNumber) {
-    //     List<Order> orderList=new ArrayList<>();
-    //     List<OrderResponseDto> orderResponseDtoList=new ArrayList<>();
-
-    //     orderList = orderRepository.findByNameAndPhoneNumberAndOrderNumber(name, phoneNumber, orderNumber);
-
-    //     if(orderList.size()!=0){
-    //         for(Order entity : orderList){
-    //             OrderResponseDto orderResponseDto=new OrderResponseDto(entity);
-    //             orderResponseDtoList.add(orderResponseDto);
-    //         }
-    //     }
-        
-        
-
-    //     return orderResponseDtoList;
-    // }
-
-
-    
 
 }

@@ -1,6 +1,7 @@
 package com.uplus.orderservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.uplus.orderservice.entity.ProductOrder;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -28,8 +29,11 @@ public class ProductOrderRequestDto {
     @JsonProperty("discount_type")
     private int discountType;
 
+    @JsonProperty("pay_period")
+    private int payPeriod;
+
     @JsonProperty("month_price")
-    private String monthPrice;
+    private int monthPrice;
 
     @Builder
     public ProductOrderRequestDto(String name, 
@@ -40,7 +44,8 @@ public class ProductOrderRequestDto {
                         String phoneColor,
                         String planCode,
                         int discountType,
-                        String monthPrice) {
+                        int payPeriod,
+                        int monthPrice) {
 
         this.name=name;
         this.email=email;
@@ -50,7 +55,16 @@ public class ProductOrderRequestDto {
         this.phoneColor=phoneColor;
         this.planCode=planCode;
         this.discountType=discountType;
+        this.payPeriod=payPeriod;
         this.monthPrice=monthPrice;
 
+    }
+
+    public ProductOrder toEntity() {
+        return ProductOrder.builder()
+                .phoneCode(phoneCode)
+                .phoneColor(phoneColor)
+                .planCode(planCode)
+                .build();
     }
 }

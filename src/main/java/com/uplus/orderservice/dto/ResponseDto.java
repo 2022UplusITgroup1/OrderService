@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class ProductResponseDto {
+public class ResponseDto {
 
     private Integer status;
     private String message;
     private Map<String,Object> data;
     
 
-    public ProductResponseDto(Integer status,
+    public ResponseDto(Integer status,
                             String message,
                             Map<String,Object> data) {
         
