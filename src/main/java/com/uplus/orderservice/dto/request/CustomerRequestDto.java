@@ -1,4 +1,4 @@
-package com.uplus.orderservice.dto;
+package com.uplus.orderservice.dto.request;
 
 import com.uplus.orderservice.entity.Customer;
 

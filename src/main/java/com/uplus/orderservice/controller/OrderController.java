@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,20 +13,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uplus.orderservice.dto.CustomerRequestDto;
-import com.uplus.orderservice.dto.CustomerResponseDto;
-import com.uplus.orderservice.dto.PhoneResponseDto;
-import com.uplus.orderservice.dto.PlanResponseDto;
-import com.uplus.orderservice.dto.ProductOrderRequestDto;
-import com.uplus.orderservice.dto.ProductOrderResponseDto;
 import com.uplus.orderservice.dto.ResponseDto;
 import com.uplus.orderservice.dto.ResponseMessage;
+import com.uplus.orderservice.dto.request.CustomerRequestDto;
+import com.uplus.orderservice.dto.request.ProductOrderRequestDto;
+import com.uplus.orderservice.dto.response.CustomerResponseDto;
+import com.uplus.orderservice.dto.response.PhoneResponseDto;
+import com.uplus.orderservice.dto.response.PlanResponseDto;
+import com.uplus.orderservice.dto.response.ProductOrderResponseDto;
 import com.uplus.orderservice.service.OrderService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.RequiredArgsConstructor;
+
 
 @RequiredArgsConstructor
 @RequestMapping("/order")
@@ -53,6 +55,23 @@ public class OrderController {
     public ProductOrderResponseDto findOrderById (@PathVariable Long id) {
 
         return orderService.findOrderById(id);
+    }
+
+    //상품 주문 상세
+    @GetMapping("/orderform")
+    public Map<String, Object> getOrderForm(@RequestParam("name") String name, @RequestParam("phone_number") String phoneNumber, @RequestParam("order_number") String orderNumber) {
+        Map<String, Object> map = new HashMap<>();
+
+        logger.info("name : " + name +
+                    " phone_number : " + phoneNumber + " order_number : " + orderNumber);
+        
+        
+        CustomerResponseDto customerResponseDto=orderService.getCustomer(name, phoneNumber);
+
+        
+
+
+        return map;
     }
 
     // @GetMapping("/order/my/list")
@@ -138,7 +157,7 @@ public class OrderController {
                 //주문자 정보 입력
                 Long customerId=orderService.saveCustomerProductOrder(productOrderRequestDto);
                 // if(customerId!=null){// Transaction 성공시
-                        //결제가 완료되었습니다.
+                        //주문 결제가 완료되었습니다.
 
                 //     //주문 정보 입력
                 //     Long productOrderId=orderService.saveProductOrder(productOrderRequestDto, customerId);
@@ -146,12 +165,12 @@ public class OrderController {
 
             }else{
                 //DB 가격 정보 상이. 결제 실패
-                //주문정보가 다릅니다. 결제를 다시 진행해주세요.
+                //주문 정보가 다릅니다. 결제를 다시 진행해주세요.
 
             }
         }else{
             //Product 정보 가져오기 실패
-            //"주문정보를 가져올 수 없습니다."
+            //"상품 정보를 확인할 수 없습니다."
         }
 
         return productResponseDto;

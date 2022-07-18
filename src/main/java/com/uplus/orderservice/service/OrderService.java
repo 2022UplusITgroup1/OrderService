@@ -1,8 +1,11 @@
 package com.uplus.orderservice.service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -11,12 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uplus.orderservice.feginclient.ProductServiceClient;
-import com.uplus.orderservice.dto.CustomerRequestDto;
-import com.uplus.orderservice.dto.CustomerResponseDto;
-import com.uplus.orderservice.dto.ProductOrderRequestDto;
-import com.uplus.orderservice.dto.ProductOrderResponseDto;
+import com.uplus.orderservice.dto.DiscountType;
 import com.uplus.orderservice.dto.ResponseDto;
 import com.uplus.orderservice.dto.ResponseMessage;
+import com.uplus.orderservice.dto.request.CustomerRequestDto;
+import com.uplus.orderservice.dto.request.ProductOrderRequestDto;
+import com.uplus.orderservice.dto.response.CustomerResponseDto;
+import com.uplus.orderservice.dto.response.ProductOrderResponseDto;
 import com.uplus.orderservice.entity.Customer;
 import com.uplus.orderservice.entity.ProductOrder;
 import com.uplus.orderservice.repository.CustomerRepository;
@@ -37,6 +41,15 @@ public class OrderService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     // private final RestTemplate restTemplate;
+    
+    public static String getCurrentDateTime() {
+		Date today = new Date();
+		Locale currentLocale = new Locale("KOREAN", "KOREA");
+		String pattern = "yyyyMMddHHmmss"; //hhmmss로 시간,분,초만 뽑기도 가능
+		SimpleDateFormat formatter = new SimpleDateFormat(pattern,
+				currentLocale);
+		return formatter.format(today);
+	}
 
     @Transactional
     public Long save(CustomerRequestDto requestDto) {
@@ -133,6 +146,15 @@ public class OrderService {
 
     public int calculatePrice (int phonePrice, int planPrice, int payPeriod, int discountType) {
 
+
+        if(discountType==DiscountType.PHONE_SUPPORT_FUND){
+            phonePrice=(phonePrice-(int)Math.ceil(phonePrice*DiscountType.PHONE_SUPPORT_FUND_RATE/100));
+        }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_12){
+            planPrice=(planPrice-(int)Math.ceil(planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_12_RATE/100));
+        }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_24){
+            planPrice=(planPrice-(int)Math.ceil(planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_24_RATE/100));
+        }
+
         int monthPrice=(phonePrice/payPeriod)+planPrice;
 
 
@@ -197,9 +219,10 @@ public class OrderService {
         //주문 번호 난수 생성 필요
         Random rand = new Random();
         rand.setSeed(System.currentTimeMillis());
-        int randNum=(int)(rand.nextDouble()*10000);
-        // int randNum=(int)(rand.nextInt(1000000));
-        String orderNumber="1234";
+        int randNum=(int)(rand.nextDouble()*1000000);
+
+        String currentDateTime=getCurrentDateTime();
+        String orderNumber=currentDateTime+randNum;
 
         ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,orderNumber,monthPrice);
 
