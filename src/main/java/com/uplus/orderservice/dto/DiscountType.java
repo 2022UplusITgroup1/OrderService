@@ -1,7 +1,5 @@
 package com.uplus.orderservice.dto;
 
-import java.util.Map;
-
 public class DiscountType {
 
     public static final int PHONE_SUPPORT_FUND = 1;

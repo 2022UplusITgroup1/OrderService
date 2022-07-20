@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @Getter
 public class ResponseDto {
 
-    private Integer status;
+    private int status;
     private String message;
     private Map<String,Object> data;
     
 
-    public ResponseDto(Integer status,
+    public ResponseDto(int status,
                             String message,
                             Map<String,Object> data) {
         

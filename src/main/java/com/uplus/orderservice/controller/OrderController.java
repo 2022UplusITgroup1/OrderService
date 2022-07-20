@@ -111,7 +111,8 @@ public class OrderController {
         }else{
 
             ProductOrder productOrder= orderService.getOrder(customer, orderNumber);
-
+            productOrderResponseDto=new ProductOrderResponseDto(productOrder);
+            productOrderResponseDto.setName(name);
             if(productOrder==null){
 
                 statusCode=StatusCode.NO_CONTENT;
@@ -158,7 +159,8 @@ public class OrderController {
         //==month_price 이면 결제.
 
         if(productResponseDto.getStatus()==200){
-            if(orderService.calculatePrice(phonePrice, planPrice, payPeriod, discountType)==monthPrice){
+            int result_month_price=orderService.calculatePrice(phonePrice, planPrice, payPeriod, discountType);
+            if(result_month_price==monthPrice){
 
                 //결제 실행
 
@@ -180,6 +182,7 @@ public class OrderController {
 
                 }else{// Transaction 실패시
                     //주문 결제가 실패하였습니다.
+                    logger.info("month_price : " +result_month_price );
                     statusCode=StatusCode.SERVICE_UNAVAILABLE;
                     statusMessage=StatusMessage.FAIL_PRODUCT_ORDER;
                 }
@@ -188,9 +191,9 @@ public class OrderController {
             }else{
                 //DB 가격 정보 상이. 결제 실패
                 //주문 정보가 다릅니다. 주문을 다시 진행해주세요.
-
+                logger.info("month_price : " +result_month_price );
                 statusCode=StatusCode.OK;
-                statusMessage=StatusMessage.NOT_FOUND_PRODUCT_ORDER;
+                statusMessage=StatusMessage.NOT_MATCH_PRODUCT_ORDER_PRICE;
             }
         }else{
             //Product 정보 가져오기 실패

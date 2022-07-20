@@ -56,14 +56,14 @@ public class OrderService {
 
 
         if(discountType==DiscountType.PHONE_SUPPORT_FUND){
-            phonePrice=(phonePrice-(int)Math.ceil(phonePrice*DiscountType.PHONE_SUPPORT_FUND_RATE/100));
+            phonePrice=(phonePrice-(int) (Math.floor((phonePrice*DiscountType.PHONE_SUPPORT_FUND_RATE/100)/10))*10);
         }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_12){
-            planPrice=(planPrice-(int)Math.ceil(planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_12_RATE/100));
+            planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_12_RATE/100)/10))*10);
         }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_24){
-            planPrice=(planPrice-(int)Math.ceil(planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_24_RATE/100));
+            planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_24_RATE/100)/10))*10);
         }
 
-        int monthPrice=(phonePrice/payPeriod)+planPrice;
+        int monthPrice=(int) Math.floor((phonePrice/payPeriod)+planPrice);
 
 
         return monthPrice;
@@ -163,8 +163,12 @@ public class OrderService {
         String phoneColor=orderRequestDto.getPhoneRequestDto().getColor();
         int discountType=orderRequestDto.getDiscountType();
 
+        logger.info("planCode : " + planCode +
+                    " phoneCode : " + phoneCode + " phoneColor : " + phoneColor+"discountType : "+discountType);
+
         ResponseDto productResponseDto=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
 
+        logger.info("productResponseDto : " + productResponseDto.getStatus()+" "+ productResponseDto.getData());
 
         return productResponseDto;
     }

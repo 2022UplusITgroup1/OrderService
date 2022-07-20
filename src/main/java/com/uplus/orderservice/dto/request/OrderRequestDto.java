@@ -23,7 +23,7 @@ public class OrderRequestDto {
     @JsonProperty("phone_number")
     private String phoneNumber;
 
-    @JsonProperty("discount_type")
+    @JsonProperty("discountType")
     private int discountType;
 
     @JsonProperty("payPeriod")
@@ -39,7 +39,7 @@ public class OrderRequestDto {
     private PlanRequestDto planRequestDto;
 
     @Data
-    private static class PhoneRequestDto{
+    public static class PhoneRequestDto{
 
         @JsonProperty("code")
         private String code;

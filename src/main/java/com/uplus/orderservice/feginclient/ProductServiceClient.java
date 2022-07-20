@@ -19,7 +19,7 @@ public interface ProductServiceClient {
                                         @RequestParam(value = "dc_type") Integer discountType);
 
 
-    @PutMapping("/sales/{code}/{color}")
+    @PutMapping("/product/sales/{code}/{color}")
     ResponseDto updateSales(@PathVariable("code") final String phoneCode,
                             @PathVariable("color") final String phoneColor);
                                         
