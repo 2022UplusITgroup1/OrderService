@@ -15,13 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uplus.orderservice.feginclient.ProductServiceClient;
 import com.uplus.orderservice.dto.DiscountType;
-import com.uplus.orderservice.dto.ResponseDto;
 import com.uplus.orderservice.dto.ResponseMessage;
+import com.uplus.orderservice.dto.StatusCode;
+import com.uplus.orderservice.dto.StatusMessage;
+import com.uplus.orderservice.dto.common.ResponseDto;
 import com.uplus.orderservice.dto.request.CustomerRequestDto;
 import com.uplus.orderservice.dto.request.OrderRequestDto;
 import com.uplus.orderservice.dto.request.ProductOrderRequestDto;
 import com.uplus.orderservice.dto.response.CustomerResponseDto;
 import com.uplus.orderservice.dto.response.ProductOrderResponseDto;
+import com.uplus.orderservice.dto.response.feign.ProductResponseDto;
 import com.uplus.orderservice.entity.Customer;
 import com.uplus.orderservice.entity.ProductOrder;
 import com.uplus.orderservice.repository.CustomerRepository;
@@ -41,7 +44,6 @@ public class OrderService {
 
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    // private final RestTemplate restTemplate;
     
     public static String getCurrentDateTime() {
 		Date today = new Date();
@@ -52,7 +54,20 @@ public class OrderService {
 		return formatter.format(today);
 	}
 
-    public int calculatePrice (int phonePrice, int planPrice, int payPeriod, int discountType) {
+    public boolean calculatePrice (OrderRequestDto orderRequestDto, ProductResponseDto productResponseDto) {
+
+        //productResponseDto 의
+        //단말 가격/할부기간
+        // +
+        //요금제 가격
+        //==month_price 이면 결제.
+
+        int phonePrice = productResponseDto.getData().getPhone().getPrice();
+        int planPrice = productResponseDto.getData().getPlan().getPrice();
+        int payPeriod = orderRequestDto.getPayPeriod();
+        int discountType = orderRequestDto.getDiscountType();
+
+        int requestMonthPrice=orderRequestDto.getMonthPrice();
 
 
         if(discountType==DiscountType.PHONE_SUPPORT_FUND){
@@ -63,24 +78,16 @@ public class OrderService {
             planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_24_RATE/100)/10))*10);
         }
 
-        int monthPrice=(int) Math.floor((phonePrice/payPeriod)+planPrice);
+        int responseMonthPrice=(int) Math.floor((phonePrice/payPeriod)/10)*10+planPrice;
 
+        logger.info("calculatePrice : " +responseMonthPrice );
 
-        return monthPrice;
+        if(requestMonthPrice==responseMonthPrice)
+            return true;
+        else
+            return false;
+
     }
-
-    // @Transactional
-    // public Long save(CustomerRequestDto requestDto) {
-        
-    //     return customerRepository.save(requestDto.toEntity()).getId();
-    // }
-
-    // public CustomerResponseDto findById (Long id) {
-    //     Customer entity = customerRepository.findById(id)
-    //             .orElseThrow(() -> new IllegalArgumentException("해당 주문자가 없습니다. id="+ id));
- 
-    //     return new CustomerResponseDto(entity);
-    // }
 
     public Customer getCustomer (String name, String phoneNumber) {
         
@@ -98,75 +105,83 @@ public class OrderService {
         return customer;
     }
 
-
-    // public ProductOrderResponseDto findOrderById (Long id) {
-    //     // Long customerId = customerResponseDto.getId();
-    //     // Order entity = orderRepository.findByCustomerId(customerId);
-    //     ProductOrder entity = productOrderRepository.findById(id)
-    //                     .orElseThrow(() -> new IllegalArgumentException("해당 주문자가 없습니다. id="+ id));
-
-    //     ProductOrderResponseDto orderResponseDto=new ProductOrderResponseDto(entity);
- 
-    //     return orderResponseDto;
-    // }
-
-    // public ProductOrderResponseDto findOrderListByCustomer ( String name, String orderNumber) {
-    //     // Long customerId = customerResponseDto.getId();
-    //     // ProductOrder entity = productOrderRepository.findByCustomerId(customerId);
-    //     ProductOrder entity = productOrderRepository.findByOrderNumber(orderNumber);
-    //     ProductOrderResponseDto productOorderResponseDto=new ProductOrderResponseDto(entity);
-    //     productOorderResponseDto.setName(name);
- 
-    //     return productOorderResponseDto;
-    // }
-
-
     public ProductOrder getOrder (Customer customer,String orderNumber) {
         ProductOrder productOrder;
 
         Long customerId = customer.getId();
 
         try{
-
             productOrder = productOrderRepository.findByCustomerIdAndOrderNumber(customerId,orderNumber);
 
         }catch(Exception e){
+
             productOrder=null;
         }
         
-
+        
         return productOrder;
     }
 
-    // public ProductOrderResponseDto findOrderByOrderNumber (String orderNumber) {
-    //     ProductOrder entity = productOrderRepository.findByOrderNumber(orderNumber);
 
-    //     ProductOrderResponseDto productOrderResponseDto=new ProductOrderResponseDto(entity);
- 
-    //     return productOrderResponseDto;
-    // }
+    public int setStatusCode(Object object){
+        int statusCode;
+
+        if(object==null){
+            statusCode=StatusCode.NO_CONTENT;
+        }else{
+            statusCode=StatusCode.OK;
+        }
+
+        return statusCode;
+    }
+
+    public String setStatusMessage(Object object, String className){
+        String statusMessage=StatusMessage.NOT_AVAILABLE_SERVICE;
+
+        // Optional<String> test=Optional.empty();
+
+        // String str=test.get();
+
+
+        //customer
+        if(className==Customer.class.getName()){
+            if(object == null){
+                //className 에 따라 statusMessage 자동바뀜..
+                statusMessage=StatusMessage.NOT_FOUND_CUSTOMER;
+    
+            }else{
+    
+                statusMessage=StatusMessage.SUCCESS_READ_CUSTOMER;
+    
+            }
+        }else if(className==ProductOrder.class.getName()){
+            if(object == null){
+                //className 에 따라 statusMessage 자동바뀜..
+                statusMessage=StatusMessage.NOT_FOUND_PRODUCT_ORDER;
+    
+            }else{
+    
+                statusMessage=StatusMessage.SUCCESS_READ_PRODUCT_ORDER;
+    
+            }
+        }
+
+        return statusMessage;
+    }
 
 
     //Feign Product Service API 통신
     //단말 정보 가져오기
-    public ResponseDto getProductDetail (String planCode, String phoneCode, String phoneColor, Integer discountType) {
-
-        ResponseDto productResponseDto=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
-
-
-        return productResponseDto;
-    }
-
-    public ResponseDto getProductDetail (OrderRequestDto orderRequestDto) {
+    public ProductResponseDto getProductDetail (OrderRequestDto orderRequestDto) {
         String planCode=orderRequestDto.getPlanRequestDto().getCode();
         String phoneCode=orderRequestDto.getPhoneRequestDto().getCode();
         String phoneColor=orderRequestDto.getPhoneRequestDto().getColor();
         int discountType=orderRequestDto.getDiscountType();
 
         logger.info("planCode : " + planCode +
-                    " phoneCode : " + phoneCode + " phoneColor : " + phoneColor+"discountType : "+discountType);
+                    " phoneCode : " + phoneCode + " phoneColor : " + phoneColor+" discountType : "+discountType);
 
-        ResponseDto productResponseDto=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
+        ProductResponseDto productResponseDto=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
 
         logger.info("productResponseDto : " + productResponseDto.getStatus()+" "+ productResponseDto.getData());
 
@@ -174,11 +189,11 @@ public class OrderService {
     }
 
 
-    @Transactional
-    public Long saveCustomer(CustomerRequestDto requestDto) {
+    // @Transactional
+    // public Long saveCustomer(CustomerRequestDto requestDto) {
         
-        return customerRepository.save(requestDto.toEntity()).getId();
-    }
+    //     return customerRepository.save(requestDto.toEntity()).getId();
+    // }
 
     @Transactional
     public Long saveCustomer(ProductOrderRequestDto productOrderRequestDto) {
@@ -193,59 +208,7 @@ public class OrderService {
         return customerRepository.save(customerRequestDto.toEntity()).getId();
     }
 
-    @Transactional
-    public Long saveProductOrder(ProductOrderRequestDto productOrderRequestDto, Long customerId) {
-
-        String phoneCode=productOrderRequestDto.getPhoneCode();
-        String phoneColor=productOrderRequestDto.getPhoneColor();
-        String planCode=productOrderRequestDto.getPlanCode();
-        int monthPrice=productOrderRequestDto.getMonthPrice();
-
-
-        String orderNumber="1234";
-
-        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,orderNumber,monthPrice);
-
-        return productOrderRepository.save(productOrderEntity).getId();
-    }
-
-    @Transactional
-    public String saveCustomerProductOrder(ProductOrderRequestDto productOrderRequestDto) {
-        //비회원 주문이므로 (주문자 정보 insert , 주문 정보 insert) Transaction
-        //insert Customer
-        String name=productOrderRequestDto.getName();
-        String email=productOrderRequestDto.getEmail();
-        String address=productOrderRequestDto.getAddress();
-        String phoneNumber=productOrderRequestDto.getPhoneNumber();
-
-        CustomerRequestDto customerRequestDto=new CustomerRequestDto(name,email,address,phoneNumber);
-        
-        Long customerId=customerRepository.save(customerRequestDto.toEntity()).getId();
-        
-        //insert ProductOrder
-        String phoneCode=productOrderRequestDto.getPhoneCode();
-        String phoneColor=productOrderRequestDto.getPhoneColor();
-        String planCode=productOrderRequestDto.getPlanCode();
-        int monthPrice=productOrderRequestDto.getMonthPrice();
-
-        //주문 번호 난수 생성 필요
-        Random rand = new Random();
-        rand.setSeed(System.currentTimeMillis());
-        int randNum=(int)(rand.nextDouble()*1000000);
-
-        String currentDateTime=getCurrentDateTime();
-        String orderNumber=currentDateTime+randNum;
-
-        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,orderNumber,monthPrice);
-
-        Long productOrderId=productOrderRepository.save(productOrderEntity).getId();
-        if(productOrderId==null){
-            orderNumber=null;
-        }
-
-        return orderNumber;
-    }
-
+    //주문정보저장
     @Transactional
     public String saveCustomerProductOrder(OrderRequestDto orderRequestDto) {
         //비회원 주문이므로 (주문자 정보 insert , 주문 정보 insert) Transaction
@@ -263,6 +226,7 @@ public class OrderService {
         String phoneCode=orderRequestDto.getPhoneRequestDto().getCode();
         String phoneColor=orderRequestDto.getPhoneRequestDto().getColor();
         String planCode=orderRequestDto.getPlanRequestDto().getCode();
+        int payPeriod=orderRequestDto.getPayPeriod();
         int monthPrice=orderRequestDto.getMonthPrice();
 
         //주문 번호 난수 생성 필요
@@ -273,7 +237,7 @@ public class OrderService {
         String currentDateTime=getCurrentDateTime();
         String orderNumber=currentDateTime+randNum;
 
-        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,orderNumber,monthPrice);
+        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,payPeriod, orderNumber,monthPrice);
 
         Long productOrderId=productOrderRepository.save(productOrderEntity).getId();
         if(productOrderId==null){
@@ -284,12 +248,6 @@ public class OrderService {
     }
 
     //판매량 증가
-    public ResponseDto updateProductSales(String phoneCode, String phoneColor){
-        ResponseDto updateResultDto=productServiceClient.updateSales(phoneCode, phoneColor);
-
-        return updateResultDto;
-    }
-
     public ResponseDto updateProductSales(OrderRequestDto orderRequestDto){
         String phoneCode=orderRequestDto.getPhoneRequestDto().getCode();
         String phoneColor=orderRequestDto.getPhoneRequestDto().getColor();

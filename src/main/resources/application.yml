@@ -1,0 +1,17 @@
+server:
+  port: 54421
+
+spring:
+  application:
+    name: orderservice
+
+---
+spring:
+  profiles:
+    active: prod
+
+---
+
+spring:
+  profiles:
+    active: local

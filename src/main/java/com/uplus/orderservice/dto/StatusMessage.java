@@ -4,6 +4,8 @@ public class StatusMessage {
     public static final String NOT_AVAILABLE_SERVICE="서비스를 사용할 수 없습니다.";
 
     public static final String NOT_FOUND_CUSTOMER = "주문자 이름 또는 전화번호를 찾을 수 없습니다.";
+    public static final String SUCCESS_READ_CUSTOMER = "주문자 조회에 성공하였습니다.";
+
     public static final String NOT_FOUND_ORDER_NUMBER = "알맞은 주문 번호를 찾을 수 없습니다.";
     public static final String SUCCESS_READ_PRODUCT_ORDER = "주문 조회에 성공하였습니다.";
 

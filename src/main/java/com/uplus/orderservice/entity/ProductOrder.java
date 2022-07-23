@@ -35,6 +35,9 @@ public class ProductOrder {
     private String planCode;
 
     @Column
+    private int payPeriod;
+
+    @Column
     private String orderNumber;
 
     @Column
@@ -63,11 +66,12 @@ public class ProductOrder {
     // private Customer customer;
 
     @Builder
-    public ProductOrder(Long customerId, String phoneCode, String phoneColor ,String planCode, String orderNumber, int monthPrice) {
+    public ProductOrder(Long customerId, String phoneCode, String phoneColor ,String planCode, int payPeriod, String orderNumber, int monthPrice) {
         this.customerId = customerId;
         this.phoneCode = phoneCode;
         this.phoneColor = phoneColor;
         this.planCode = planCode;
+        this.payPeriod=payPeriod;
         this.orderNumber = orderNumber;
         this.monthPrice = monthPrice;
     }

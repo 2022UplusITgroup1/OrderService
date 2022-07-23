@@ -26,9 +26,15 @@ public class ProductOrderResponseDto {
         this.monthPrice = entity.getMonthPrice();
     }
 
-
-    public void setName(String name) {
+    public ProductOrderResponseDto(ProductOrder entity, String name) {
         this.name=name;
+        this.phoneCode = entity.getPhoneCode();
+        this.color=entity.getPhoneColor();
+        this.planCode = entity.getPlanCode();
+        this.orderNumber = entity.getOrderNumber();
+        this.monthPrice = entity.getMonthPrice();
     }
+
+
 
 }
