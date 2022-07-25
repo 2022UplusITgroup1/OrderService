@@ -1,8 +1,9 @@
-package com.uplus.orderservice.dto;
+package com.uplus.orderservice.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 ////////////////////////////////////
 // Create Date: 2022.07.14        //
@@ -10,6 +11,7 @@ import lombok.Data;
 ///////////////////////////////////
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class ResponseMessage<T> {
     private int status;

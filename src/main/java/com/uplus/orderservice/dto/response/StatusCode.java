@@ -1,4 +1,4 @@
-package com.uplus.orderservice.dto;
+package com.uplus.orderservice.dto.response;
 
 ////////////////////////////////////
 // Create Date: 2022.07.14        //

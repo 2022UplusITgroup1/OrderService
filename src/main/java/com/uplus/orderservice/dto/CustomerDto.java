@@ -1,4 +1,4 @@
-package com.uplus.orderservice.dto.request;
+package com.uplus.orderservice.dto;
 
 import com.uplus.orderservice.entity.Customer;
 
@@ -6,17 +6,25 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @NoArgsConstructor
-public class CustomerRequestDto {
-
+@Getter
+public class CustomerDto {
+    private Long id;
     private String name;
     private String email;
     private String address;
     private String phoneNumber;
 
+    public CustomerDto(Customer entity) {
+        this.id=entity.getId();
+        this.name=entity.getName();
+        this.email=entity.getEmail();
+        this.address=entity.getAddress();
+        this.phoneNumber=entity.getPhoneNumber();
+    }
+
     @Builder
-    public CustomerRequestDto(String name, String email, String address, String phoneNumber) {
+    public CustomerDto(String name, String email, String address, String phoneNumber) {
         this.name=name;
         this.email=email;
         this.address=address;
@@ -31,5 +39,4 @@ public class CustomerRequestDto {
                .phoneNumber(phoneNumber)
                .build();
     }
-    
 }

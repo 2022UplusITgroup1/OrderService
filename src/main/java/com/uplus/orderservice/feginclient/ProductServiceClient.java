@@ -6,21 +6,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.uplus.orderservice.dto.ResponseDto;
-import com.uplus.orderservice.dto.ResponseMessage;
+import com.uplus.orderservice.dto.feign.PhoneDto;
+import com.uplus.orderservice.dto.feign.ProductDto;
+import com.uplus.orderservice.dto.response.ResponseMessage;
 
 @FeignClient("productservice")
 public interface ProductServiceClient {
 
     @GetMapping("/product/detail")
-    ResponseDto getProductDetail(@RequestParam(value = "pl_code") String planCode,
+    ResponseMessage<ProductDto> getProductDetail(@RequestParam(value = "pl_code") String planCode,
                                         @RequestParam(value = "ph_code") String phoneCode,
                                         @RequestParam(value = "color") String color,
                                         @RequestParam(value = "dc_type") Integer discountType);
 
 
     @PutMapping("/product/sales/{code}/{color}")
-    ResponseDto updateSales(@PathVariable("code") final String phoneCode,
-                            @PathVariable("color") final String phoneColor);
+    ResponseMessage<PhoneDto> updateSales(@PathVariable("code") final String phoneCode,
+                                        @PathVariable("color") final String phoneColor);
                                         
 }

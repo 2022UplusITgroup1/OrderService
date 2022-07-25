@@ -1,7 +1,7 @@
 HELP.md
 .gradle
 build/
-*.yml
+application-prod.yml
 
 
 !gradle/wrapper/gradle-wrapper.jar
