@@ -1,4 +1,4 @@
-package com.uplus.orderservice.dto.common;
+package com.uplus.orderservice.dto.feign;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Getter
-public class BrandDto {
-    @JsonProperty("name")
-    private String name;
+public class StorageDto {
+    @JsonProperty("capability")
+    private Integer capability;
 }

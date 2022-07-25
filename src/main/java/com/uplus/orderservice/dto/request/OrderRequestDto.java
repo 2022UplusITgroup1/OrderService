@@ -1,6 +1,8 @@
 package com.uplus.orderservice.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.uplus.orderservice.dto.feign.PhoneDto;
+import com.uplus.orderservice.dto.feign.PlanDto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +22,7 @@ public class OrderRequestDto {
     @JsonProperty("address")
     private String address;
 
-    @JsonProperty("phone_number")
+    @JsonProperty("phoneNumber")
     private String phoneNumber;
 
     @JsonProperty("discountType")
@@ -33,44 +35,11 @@ public class OrderRequestDto {
     private int monthPrice;
 
     @JsonProperty("phone")
-    private PhoneRequestDto phoneRequestDto;
+    private PhoneDto phoneDto;
 
     @JsonProperty("plan")
-    private PlanRequestDto planRequestDto;
+    private PlanDto planDto;
 
-    @Data
-    public static class PhoneRequestDto{
-
-        @JsonProperty("code")
-        private String code;
-
-        @JsonProperty("name")
-        private String name;
-
-        @JsonProperty("storage")
-        private int storage;
-
-        @JsonProperty("color")
-        private String color;
-
-        @JsonProperty("price")
-        private int price;
-        
-    }
-
-    @Data
-    public static class PlanRequestDto{
-
-        @JsonProperty("code")
-        private String code;
-
-        @JsonProperty("name")
-        private String name;
-
-        @JsonProperty("price")
-        private int price;
-        
-    }
 
     @Builder
     public OrderRequestDto(String name, 
@@ -80,8 +49,8 @@ public class OrderRequestDto {
                         int discountType,
                         int payPeriod,
                         int monthPrice,
-                        PhoneRequestDto phoneRequestDto,
-                        PlanRequestDto planRequestDto) {
+                        PhoneDto phoneDto,
+                        PlanDto planDto) {
 
         this.name=name;
         this.email=email;
@@ -90,8 +59,8 @@ public class OrderRequestDto {
         this.discountType=discountType;
         this.payPeriod=payPeriod;
         this.monthPrice=monthPrice;
-        this.phoneRequestDto=phoneRequestDto;
-        this.planRequestDto=planRequestDto;
+        this.phoneDto=phoneDto;
+        this.planDto=planDto;
 
     }
 

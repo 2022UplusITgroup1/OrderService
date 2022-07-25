@@ -1,4 +1,4 @@
-package com.uplus.orderservice.dto.common;
+package com.uplus.orderservice.dto.feign;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

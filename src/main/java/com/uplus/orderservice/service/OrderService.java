@@ -14,21 +14,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.uplus.orderservice.feginclient.ProductServiceClient;
-import com.uplus.orderservice.dto.DiscountType;
-import com.uplus.orderservice.dto.ResponseMessage;
-import com.uplus.orderservice.dto.StatusCode;
-import com.uplus.orderservice.dto.StatusMessage;
-import com.uplus.orderservice.dto.common.ResponseDto;
-import com.uplus.orderservice.dto.request.CustomerRequestDto;
+import com.uplus.orderservice.dto.CustomerDto;
+import com.uplus.orderservice.dto.ProductOrderDto;
+import com.uplus.orderservice.dto.feign.PhoneDto;
+import com.uplus.orderservice.dto.feign.ProductDto;
 import com.uplus.orderservice.dto.request.OrderRequestDto;
-import com.uplus.orderservice.dto.request.ProductOrderRequestDto;
-import com.uplus.orderservice.dto.response.CustomerResponseDto;
-import com.uplus.orderservice.dto.response.ProductOrderResponseDto;
-import com.uplus.orderservice.dto.response.feign.ProductResponseDto;
+import com.uplus.orderservice.dto.response.ResponseMessage;
 import com.uplus.orderservice.entity.Customer;
 import com.uplus.orderservice.entity.ProductOrder;
 import com.uplus.orderservice.repository.CustomerRepository;
 import com.uplus.orderservice.repository.ProductOrderRepository;
+import com.uplus.orderservice.service.data.DiscountType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +41,18 @@ public class OrderService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     
+
+    public boolean isAvailableResponse(ResponseMessage responseDto){
+
+
+        if(responseDto.getStatus()==200){
+            return true;
+        }
+
+        return false;
+    }
+
+
     public static String getCurrentDateTime() {
 		Date today = new Date();
 		Locale currentLocale = new Locale("KOREAN", "KOREA");
@@ -54,7 +62,7 @@ public class OrderService {
 		return formatter.format(today);
 	}
 
-    public boolean calculatePrice (OrderRequestDto orderRequestDto, ProductResponseDto productResponseDto) {
+    public boolean isValidPrice (OrderRequestDto orderRequestDto, ResponseMessage<ProductDto> productResponseDto) {
 
         //productResponseDto 의
         //단말 가격/할부기간
@@ -82,6 +90,7 @@ public class OrderService {
 
         logger.info("calculatePrice : " +responseMonthPrice );
 
+        // return responseMonthPrice;
         if(requestMonthPrice==responseMonthPrice)
             return true;
         else
@@ -89,128 +98,76 @@ public class OrderService {
 
     }
 
-    public Customer getCustomer (String name, String phoneNumber) {
+    public CustomerDto getCustomer (String name, String phoneNumber) {
         
         //=null 안하면 null값 할당 안됨.
-        Customer customer;
+        CustomerDto customerDto;
 
         try{
-            customer = customerRepository.findByNameAndPhoneNumber(name, phoneNumber);
+            Customer customer = customerRepository.findByNameAndPhoneNumber(name, phoneNumber);
+            customerDto = new CustomerDto(customer);
 
         }catch(Exception e){
-            customer = null;
+            customerDto = null;
         }
 
  
-        return customer;
+        return customerDto;
     }
 
-    public ProductOrder getOrder (Customer customer,String orderNumber) {
-        ProductOrder productOrder;
+    public ProductOrderDto getOrder (CustomerDto customerDto,String orderNumber) {
 
-        Long customerId = customer.getId();
-
-        try{
-            productOrder = productOrderRepository.findByCustomerIdAndOrderNumber(customerId,orderNumber);
-
-        }catch(Exception e){
-
-            productOrder=null;
-        }
         
-        
-        return productOrder;
-    }
+        ProductOrderDto productOrderDto;
 
-
-    public int setStatusCode(Object object){
-        int statusCode;
-
-        if(object==null){
-            statusCode=StatusCode.NO_CONTENT;
+        if(customerDto==null){
+            productOrderDto=null;
         }else{
-            statusCode=StatusCode.OK;
-        }
+            Long customerId = customerDto.getId();
 
-        return statusCode;
-    }
+            try{
+                ProductOrder productOrder = productOrderRepository.findByCustomerIdAndOrderNumber(customerId,orderNumber);
+                productOrderDto=new ProductOrderDto(productOrder,customerDto.getName());
 
-    public String setStatusMessage(Object object, String className){
-        String statusMessage=StatusMessage.NOT_AVAILABLE_SERVICE;
+            }catch(Exception e){
 
-        // Optional<String> test=Optional.empty();
-
-        // String str=test.get();
-
-
-        //customer
-        if(className==Customer.class.getName()){
-            if(object == null){
-                //className 에 따라 statusMessage 자동바뀜..
-                statusMessage=StatusMessage.NOT_FOUND_CUSTOMER;
-    
-            }else{
-    
-                statusMessage=StatusMessage.SUCCESS_READ_CUSTOMER;
-    
-            }
-        }else if(className==ProductOrder.class.getName()){
-            if(object == null){
-                //className 에 따라 statusMessage 자동바뀜..
-                statusMessage=StatusMessage.NOT_FOUND_PRODUCT_ORDER;
-    
-            }else{
-    
-                statusMessage=StatusMessage.SUCCESS_READ_PRODUCT_ORDER;
-    
+                productOrderDto=null;
             }
         }
 
-        return statusMessage;
+        
+        
+        
+        return productOrderDto;
     }
+
 
 
     //Feign Product Service API 통신
     //단말 정보 가져오기
-    public ProductResponseDto getProductDetail (OrderRequestDto orderRequestDto) {
-        String planCode=orderRequestDto.getPlanRequestDto().getCode();
-        String phoneCode=orderRequestDto.getPhoneRequestDto().getCode();
-        String phoneColor=orderRequestDto.getPhoneRequestDto().getColor();
-        int discountType=orderRequestDto.getDiscountType();
+    public ResponseMessage<ProductDto> getProductDetail (String planCode, String phoneCode, String phoneColor, int discountType) {
+
+        ResponseMessage<ProductDto> productResponseDto;
 
         logger.info("planCode : " + planCode +
                     " phoneCode : " + phoneCode + " phoneColor : " + phoneColor+" discountType : "+discountType);
+        try{
+            productResponseDto=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
 
-        ProductResponseDto productResponseDto=productServiceClient.getProductDetail(planCode, phoneCode, phoneColor, discountType);
-
-        logger.info("productResponseDto : " + productResponseDto.getStatus()+" "+ productResponseDto.getData());
+        }catch(Exception e){
+            // e.printStackTrace();
+            productResponseDto=null;
+        }
+        
 
         return productResponseDto;
     }
 
 
-    // @Transactional
-    // public Long saveCustomer(CustomerRequestDto requestDto) {
-        
-    //     return customerRepository.save(requestDto.toEntity()).getId();
-    // }
-
-    @Transactional
-    public Long saveCustomer(ProductOrderRequestDto productOrderRequestDto) {
-
-        String name=productOrderRequestDto.getName();
-        String email=productOrderRequestDto.getEmail();
-        String address=productOrderRequestDto.getAddress();
-        String phoneNumber=productOrderRequestDto.getPhoneNumber();
-
-        CustomerRequestDto customerRequestDto=new CustomerRequestDto(name,email,address,phoneNumber);
-        
-        return customerRepository.save(customerRequestDto.toEntity()).getId();
-    }
 
     //주문정보저장
     @Transactional
-    public String saveCustomerProductOrder(OrderRequestDto orderRequestDto) {
+    public ProductOrderDto saveCustomerProductOrder(OrderRequestDto orderRequestDto) {
         //비회원 주문이므로 (주문자 정보 insert , 주문 정보 insert) Transaction
         //insert Customer
         String name=orderRequestDto.getName();
@@ -218,14 +175,15 @@ public class OrderService {
         String address=orderRequestDto.getAddress();
         String phoneNumber=orderRequestDto.getPhoneNumber();
 
-        CustomerRequestDto customerRequestDto=new CustomerRequestDto(name,email,address,phoneNumber);
+        CustomerDto customerDto=new CustomerDto(name,email,address,phoneNumber);
         
-        Long customerId=customerRepository.save(customerRequestDto.toEntity()).getId();
+        Long customerId=customerRepository.save(customerDto.toEntity()).getId();
         
         //insert ProductOrder
-        String phoneCode=orderRequestDto.getPhoneRequestDto().getCode();
-        String phoneColor=orderRequestDto.getPhoneRequestDto().getColor();
-        String planCode=orderRequestDto.getPlanRequestDto().getCode();
+        String phoneCode=orderRequestDto.getPhoneDto().getCode();
+        String phoneColor=orderRequestDto.getPhoneDto().getColor();
+        String planCode=orderRequestDto.getPlanDto().getCode();
+        int discountType=orderRequestDto.getDiscountType();
         int payPeriod=orderRequestDto.getPayPeriod();
         int monthPrice=orderRequestDto.getMonthPrice();
 
@@ -233,28 +191,28 @@ public class OrderService {
         Random rand = new Random();
         rand.setSeed(System.currentTimeMillis());
         int randNum=(int)(rand.nextDouble()*1000000);
+        String randNumString = String.format("%06d", randNum);
 
         String currentDateTime=getCurrentDateTime();
-        String orderNumber=currentDateTime+randNum;
+        String orderNumber=currentDateTime+randNumString;
 
-        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode,payPeriod, orderNumber,monthPrice);
+        ProductOrder productOrderEntity=new ProductOrder(customerId,phoneCode,phoneColor,planCode, discountType, payPeriod, orderNumber,monthPrice);
 
-        Long productOrderId=productOrderRepository.save(productOrderEntity).getId();
-        if(productOrderId==null){
-            orderNumber=null;
-        }
+        ProductOrderDto productOrderDto=new ProductOrderDto(productOrderRepository.save(productOrderEntity));
 
-        return orderNumber;
+        return productOrderDto;
     }
 
-    //판매량 증가
-    public ResponseDto updateProductSales(OrderRequestDto orderRequestDto){
-        String phoneCode=orderRequestDto.getPhoneRequestDto().getCode();
-        String phoneColor=orderRequestDto.getPhoneRequestDto().getColor();
 
-        ResponseDto updateResultDto=productServiceClient.updateSales(phoneCode, phoneColor);
+    //판매량 증가 
+    //Feign API 호출
+    public ResponseMessage<PhoneDto> updateProductSales(ProductOrderDto productOrderDto){
+        String phoneCode=productOrderDto.getPhoneCode();
+        String phoneColor=productOrderDto.getColor();
 
-        return updateResultDto;
+        ResponseMessage<PhoneDto> updatePhoneSalesDto=productServiceClient.updateSales(phoneCode, phoneColor);
+
+        return updatePhoneSalesDto;
     }
 
 
