@@ -1,0 +1,31 @@
+server:
+  port: 54421
+
+
+spring:
+  application:
+    name: orderservice
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://dev-instance-db-1.cpae2i8tmjoo.ap-northeast-2.rds.amazonaws.com:3306/orderdb?useSSL=FALSE&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: admin
+    password: 12345678
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+eureka:
+  instance:
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 60
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://ab5dc0ba438514d2fa539a54a2bde9fb-638882921.ap-northeast-2.elb.amazonaws.com:8761/eureka
