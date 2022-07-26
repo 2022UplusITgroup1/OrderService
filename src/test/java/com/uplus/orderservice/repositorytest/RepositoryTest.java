@@ -53,9 +53,9 @@ public class RepositoryTest {
 
         //then : 결과를 대입하여 success, fail 확인
         System.out.println("productOrderNums : "+productOrderNums+" checkSet.size() : "+checkSet.size());
-        // assert Not equal 
-        // fail 하면 orderNumber는 distinct
-        assertNotEquals(productOrderNums, checkSet.size(), "productOrderNums : "+productOrderNums+" checkSet.size() : "+checkSet.size());
+        // assert equal 
+        // success 하면 orderNumber는 distinct
+        assertEquals(productOrderNums, checkSet.size(), "productOrderNums : "+productOrderNums+" checkSet.size() : "+checkSet.size());
         
 
     }

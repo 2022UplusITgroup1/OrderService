@@ -47,12 +47,12 @@ public class OrderController {
         CustomerDto customerDto=orderService.getCustomer(name, phoneNumber);
 
         if(customerDto==null)
-            return ResponseMessage.res(StatusCode.NO_CONTENT,StatusMessage.NOT_FOUND_CUSTOMER,customerDto);
+            return ResponseMessage.res(StatusCode.NO_CONTENT,StatusMessage.NOT_FOUND_CUSTOMER);
         
         ProductOrderDto productOrderDto= orderService.getOrder(customerDto, orderNumber);
 
         if(productOrderDto==null)
-            return ResponseMessage.res(StatusCode.NO_CONTENT,StatusMessage.NOT_FOUND_ORDER_NUMBER,productOrderDto);
+            return ResponseMessage.res(StatusCode.NO_CONTENT,StatusMessage.NOT_FOUND_ORDER_NUMBER);
 
         ResponseMessage<ProductDto> productResponseDto=orderService.getProductDetail(productOrderDto.getPlanCode(), productOrderDto.getPhoneCode(), productOrderDto.getColor(), productOrderDto.getDiscountType());
 
