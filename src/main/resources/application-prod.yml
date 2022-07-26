@@ -28,4 +28,5 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://ab5dc0ba438514d2fa539a54a2bde9fb-638882921.ap-northeast-2.elb.amazonaws.com:8761/eureka
+      defaultZone: http://a9630be5aa11c4d0a8ae29e80ddf7437-1705600513.ap-northeast-2.elb.amazonaws.com:8761/eureka
+      
