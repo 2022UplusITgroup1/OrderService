@@ -62,6 +62,15 @@ public class OrderService {
 		return formatter.format(today);
 	}
 
+    public static int calcInstallmentFee(int phonePrice, Double rate) {
+        rate = rate * 0.01;
+      
+        int r_money = (int) Math.floor(Math.floor((Double)(phonePrice * rate)) / 12);
+      
+        return r_money; //할부이자
+
+    }
+
     public boolean isValidPrice (OrderRequestDto orderRequestDto, ResponseMessage<ProductDto> productResponseDto) {
 
         //productResponseDto 의
@@ -82,11 +91,23 @@ public class OrderService {
             phonePrice=(phonePrice-(int) (Math.floor((phonePrice*DiscountType.PHONE_SUPPORT_FUND_RATE/100)/10))*10);
         }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_12){
             planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_12_RATE/100)/10))*10);
+
         }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_24){
             planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_24_RATE/100)/10))*10);
         }
+        int responseMonthPrice;
+        int monthInstallmentFee=0;
+        int totalInstallmentFee=0;
+        int monthPhonePrice=(int) Math.floor((phonePrice/payPeriod)/10)*10;
+        
+        double rate=5.9;
+        if(payPeriod>=12){
+            monthInstallmentFee=calcInstallmentFee(phonePrice,rate);
+            totalInstallmentFee=monthInstallmentFee*(payPeriod/2);
+        }
+        responseMonthPrice=monthPhonePrice+monthInstallmentFee;
 
-        int responseMonthPrice=(int) Math.floor((phonePrice/payPeriod)/10)*10+planPrice;
+        
 
         logger.info("calculatePrice : " +responseMonthPrice );
 
