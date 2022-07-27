@@ -7,7 +7,7 @@ spring:
     name: orderservice
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://dev-instance-db-1.cpae2i8tmjoo.ap-northeast-2.rds.amazonaws.com:3306/orderdb?useSSL=FALSE&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://db-instance-for-1-order.cpae2i8tmjoo.ap-northeast-2.rds.amazonaws.com:3306/orderdb?useSSL=FALSE&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: admin
     password: 12345678
   jpa:
