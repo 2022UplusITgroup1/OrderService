@@ -65,7 +65,7 @@ public class OrderService {
     public static int calcInstallmentFee(int phonePrice, Double rate) {
         rate = rate * 0.01;
       
-        int r_money = (int) Math.floor(Math.floor((Double)(phonePrice * rate)) / 12);
+        int r_money = (int) (Math.floor(Math.floor((Double)(phonePrice * rate)) / 12)/10)*10;
       
         return r_money; //할부이자
 
