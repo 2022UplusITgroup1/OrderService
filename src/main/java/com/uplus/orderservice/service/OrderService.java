@@ -72,7 +72,8 @@ public class OrderService {
     }
 
     public boolean isValidPrice (OrderRequestDto orderRequestDto, ResponseMessage<ProductDto> productResponseDto) {
-
+	
+	return true;
         //productResponseDto 의
         //단말 가격/할부기간
         // +
