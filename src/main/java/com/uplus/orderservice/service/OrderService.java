@@ -74,49 +74,50 @@ public class OrderService {
     public boolean isValidPrice (OrderRequestDto orderRequestDto, ResponseMessage<ProductDto> productResponseDto) {
 	
 	return true;
+	    
         //productResponseDto 의
         //단말 가격/할부기간
         // +
         //요금제 가격
         //==month_price 이면 결제.
 
-        int phonePrice = productResponseDto.getData().getPhone().getPrice();
-        int planPrice = productResponseDto.getData().getPlan().getPrice();
-        int payPeriod = orderRequestDto.getPayPeriod();
-        int discountType = orderRequestDto.getDiscountType();
+	//         int phonePrice = productResponseDto.getData().getPhone().getPrice();
+	//         int planPrice = productResponseDto.getData().getPlan().getPrice();
+	//         int payPeriod = orderRequestDto.getPayPeriod();
+	//         int discountType = orderRequestDto.getDiscountType();
 
-        int requestMonthPrice=orderRequestDto.getMonthPrice();
+	//         int requestMonthPrice=orderRequestDto.getMonthPrice();
 
 
-        if(discountType==DiscountType.PHONE_SUPPORT_FUND){
-            phonePrice=(phonePrice-(int) (Math.floor((phonePrice*DiscountType.PHONE_SUPPORT_FUND_RATE/100)/10))*10);
-        }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_12){
-            planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_12_RATE/100)/10))*10);
+	//         if(discountType==DiscountType.PHONE_SUPPORT_FUND){
+	//             phonePrice=(phonePrice-(int) (Math.floor((phonePrice*DiscountType.PHONE_SUPPORT_FUND_RATE/100)/10))*10);
+	//         }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_12){
+	//             planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_12_RATE/100)/10))*10);
 
-        }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_24){
-            planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_24_RATE/100)/10))*10);
-        }
-        int responseMonthPrice;
-        int monthInstallmentFee=0;
-        int totalInstallmentFee=0;
-        int monthPhonePrice=(int) Math.floor((phonePrice/payPeriod)/10)*10;
-        
-        double rate=5.9;
-        if(payPeriod>=12){
-            monthInstallmentFee=calcInstallmentFee(phonePrice,rate);
-            totalInstallmentFee=monthInstallmentFee*(payPeriod/2);
-        }
-        responseMonthPrice=monthPhonePrice+monthInstallmentFee;
+	//         }else if(discountType==DiscountType.PLAN_SELECTIVE_AGREEMENT_24){
+	//             planPrice=(planPrice-(int) (Math.floor((planPrice*DiscountType.PLAN_SELECTIVE_AGREEMENT_24_RATE/100)/10))*10);
+	//         }
+	//         int responseMonthPrice;
+	//         int monthInstallmentFee=0;
+	//         int totalInstallmentFee=0;
+	//         int monthPhonePrice=(int) Math.floor((phonePrice/payPeriod)/10)*10;
 
-        
+	//         double rate=5.9;
+	//         if(payPeriod>=12){
+	//             monthInstallmentFee=calcInstallmentFee(phonePrice,rate);
+	//             totalInstallmentFee=monthInstallmentFee*(payPeriod/2);
+	//         }
+	//         responseMonthPrice=monthPhonePrice+monthInstallmentFee;
 
-        logger.info("calculatePrice : " +responseMonthPrice );
 
-        // return responseMonthPrice;
-        if(requestMonthPrice==responseMonthPrice)
-            return true;
-        else
-            return false;
+
+	//         logger.info("calculatePrice : " +responseMonthPrice );
+
+	//         // return responseMonthPrice;
+	//         if(requestMonthPrice==responseMonthPrice)
+	//             return true;
+	//         else
+	//             return false;
 
     }
 
